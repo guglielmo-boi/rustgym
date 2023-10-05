@@ -37,7 +37,7 @@ fn multiply(a: i32, b: f32, c: f64) -> f64{
 const SPEED_OF_LIGHT: f32 = 299792458.0;
 
 fn e_equals_mc_squared(mass: f32) -> f32{
-    mass * SPEED_OF_LIGHT.powf(2.0)
+    mass * SPEED_OF_LIGHT.powi(2)
 }
 
 
@@ -66,10 +66,9 @@ fn lord_farquaad(s: String) -> String {
     returns the corresponding f32. If there is no such furniture in the HashMap, return -1.0.
 */
 fn get_furniture_price(furniture_map: &HashMap<String, f32>, furniture: String) -> f32 {
-    if furniture_map.contains_key(&furniture) {
-        *(furniture_map.get(&furniture).unwrap())
-    } else {
-        -1.0
+    match furniture_map.get(&furniture) {
+        Some(x) => x.clone(),
+        None => -1.0,
     }
 }
 

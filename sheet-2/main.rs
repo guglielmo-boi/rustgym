@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::slice::Iter;
 
 /*
     1. Write a function called modify_odd that takes a mutable reference to an vecay slice of
@@ -7,7 +8,7 @@ use std::collections::HashMap;
     and pass it to modify_odd.
 */
 fn modify_odd(slice: &mut [i32]) {
-    for num in slice.iter_mut() {
+    for num in slice {
         if *num % 2 == 1 {
             *num = 0;
         }
@@ -112,9 +113,10 @@ fn insert_if_longer(vec: &mut Vec<String>, str: String) {
     6. Write a function build_vector that takes a Iter<i32> and returns the Vec<i32>
     containing all the elements of the iterator.
 */
-// fn build_vector(iter: Iter<i32>) -> Vec<i32> {
-//     iter.collect();
-// }
+fn build_vector(iter: Iter<i32>) -> Vec<i32> {
+    let ret: Vec<i32> = iter.cloned().collect();
+    ret
+}
 
 
 /*
@@ -190,7 +192,21 @@ enum Foo
 
 
 /*
-    
+    10 .Write these enums to represent a mathematical expression:
+    One enum is called  Operation  and can be:  Add ,  Sub ,  Mul ,  Div .
+    One enum is called  Expression  an can be:
+    Number  (contain inside an i32)
+    Operation  (contain inside a left Expression, a right Expression and an
+    Operation)
+    Note: the left and right expression must be wrapped around a Box
+    You will see Boxes further into the course, from now you just need to know that you can
+    build a box using
+    and you can get the value inside the box by dereferencing it
+    Write a function  evaluate_expression  that take as input an Expression, and return a
+    Result with a i32 if the result is evaluated correctly, or a string if an error occurs.
+    Box<Expression>.
+    let my_box = Box::new(my_expression)
+    let value_inside = *my_box
 */
 
 fn main()
@@ -212,6 +228,8 @@ fn main()
 
     insert_if_longer(&mut vec![String::from("str")], String::from("reallylongstring"));
 
+    build_vector(vec![0, 1, 2, 3, 4].iter());
+    
     pancake_sort(&mut vec![0, 2, 3, 1, 4]);
 
     merge(&[0, 1, 2, 3, 4], &[0, 1, 2, 3, 4]);
@@ -219,6 +237,4 @@ fn main()
     let mut vec = Vec::new();
     vec.push(Foo::Num(10));
     vec.push(Foo::Str(String::from("apple")));
-
-    
 }
