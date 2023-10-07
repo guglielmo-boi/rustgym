@@ -192,12 +192,12 @@ enum Foo
 
 
 /*
-    10 .Write these enums to represent a mathematical expression:
-    One enum is called  Operation  and can be:  Add ,  Sub ,  Mul ,  Div .
+    10. Write these enums to represent a mathematical expression:
+    One enum is called  Operator  and can be:  Add, Sub, Mul, Div.
     One enum is called  Expression  an can be:
-    Number  (contain inside an i32)
-    Operation  (contain inside a left Expression, a right Expression and an
-    Operation)
+    Number (contain inside an i32)
+    Operation (contain inside a left Expression, a right Expression and an
+    Operator)
     Note: the left and right expression must be wrapped around a Box
     You will see Boxes further into the course, from now you just need to know that you can
     build a box using
@@ -208,6 +208,55 @@ enum Foo
     let my_box = Box::new(my_expression)
     let value_inside = *my_box
 */
+
+enum Operator
+{
+    Add,
+    Sub,
+    Mul,
+    Div
+}
+
+enum Expression
+{
+    Number(i32),
+    Operation(Box<Expression>, Box<Expression>, Operator)
+}
+
+fn evaluate_expression(expression: Expression) -> Result<i32, String> {
+    match expression {
+        Expression::Number(x) => Ok(x),
+        Expression::Operation(e1, e2, op) => {
+            let lhs = evaluate_expression(*e1);
+            let rhs = evaluate_expression(*e2);
+
+            match lhs {
+                Ok(x) => {
+                    match rhs {
+                        Ok(y) => {
+                            match op {
+                                Operator::Add => Ok(x + y),   
+                                Operator::Sub => Ok(x - y),
+                                Operator::Mul => Ok(x * y),
+                                Operator::Div => {
+                                    if y == 0 {
+                                        Err(String::from("Can't divide by 0!"))
+                                    } else {
+                                        Ok(x / y)
+                                    }
+                                }
+                            }
+                        },
+
+                        Err(s) => Err(s)
+                    }
+                },
+
+                Err(s) => Err(s)
+            }
+        }
+    }
+}
 
 fn main()
 { 
@@ -237,4 +286,8 @@ fn main()
     let mut vec = Vec::new();
     vec.push(Foo::Num(10));
     vec.push(Foo::Str(String::from("apple")));
+
+    let e1 = Expression::Operation(Box::new(Expression::Number(10)), Box::new(Expression::Number(15)), Operator::Add);
+    let result = evaluate_expression(Expression::Operation(Box::new(expression), Box::new(Expression::Number(2)), Operator::Mul));
+    println!("{:?}", result);
 }
