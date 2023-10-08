@@ -136,7 +136,7 @@ struct VendingMachine
 
 impl VendingMachine
 {
-    fn new(items: HashMap<Item, usize>) -> Self {
+    fn new(items: HashMap<Item, usize>) -> VendingMachine {
         VendingMachine {
             coins: 0,
             items: items
@@ -258,7 +258,7 @@ struct LibrarySystem
 
 impl LibrarySystem
 {
-    fn new() -> Self {
+    fn new() -> LibrarySystem {
         LibrarySystem {
             books: Vec::new(),
             articles: Vec::new(),
@@ -310,7 +310,7 @@ pub mod point
 
     impl Point
     {
-        pub fn new(x: f32, y: f32) -> Self {
+        pub fn new(x: f32, y: f32) -> Point {
             Point {
                 x: x,
                 y: y
@@ -337,7 +337,7 @@ pub mod line
 
     impl Line
     {
-        pub fn new(start: Point, end: Point) -> Self {
+        pub fn new(start: Point, end: Point) -> Line {
             let m = (end.y - start.y) / (end.x - start.x);
             let q = start.y - (start.x * m);
 
@@ -383,13 +383,13 @@ pub mod sentence
 
     impl Sentence
     {
-        pub fn new_default() -> Self {
+        pub fn new_default() -> Sentence {
             Sentence {
                 words: Vec::new()
             }
         }
 
-        pub fn new(s: &str) -> Self {
+        pub fn new(s: &str) -> Sentence {
             Sentence {
                 words: s.split(' ').map(|x| String::from(x)).collect()
             }
