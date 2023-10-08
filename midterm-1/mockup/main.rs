@@ -1,5 +1,5 @@
 /*
-    Write a function prev_str that takes an &str as input and returns a String. 
+    1. Write a function prev_str that takes an &str as input and returns a String. 
     This function converts the &str by replacing each character with its predecessor. For example:
 
     'b' becomes 'a' 
@@ -35,7 +35,7 @@ fn prev_str(s: &str) -> String {
 
 
 /*
-    Write a struct X with two fields: s (an Option<String> ) and i (an i32 ). Then, implement the following methods for X :
+    2. Write a struct X with two fields: s (an Option<String> ) and i (an i32 ). Then, implement the following methods for X :
     new : takes a &str and an i32 and returns an X instance
     take_str : takes a mutable reference to self and returns the s field of X , replacing it with None
 */
@@ -63,7 +63,7 @@ impl X
 
 
 /*
-    Create a function named replace_surname that takes a NameSurname struct and a String as input and returns a String.
+    3. Create a function named replace_surname that takes a NameSurname struct and a String as input and returns a String.
     The function should replace the surname of the NameSurname struct with the String and return the old surname.
     use std::mem::swap;
 */
@@ -81,14 +81,14 @@ fn replace_surname(mut person: NameSurname, mut s: String) -> String {
 
 
 /*
-    Write a struct Student with two fields: name (a String ) and id (a u32 ). Then, implement the following methods for Student :
+    4. Write a struct Student with two fields: name (a String ) and id (a u32 ). Then, implement the following methods for Student :
     new: takes a &str and a u32 and returns a Student instance
     Display: implement the Display trait for Student so that it prints the name and the id of the student
     Then write a struct University with two fields: name (a   ) and Vec<Student> ). Then, implement the following methods for
     new: takes a &str and a &[Student] and returns a
     remove_student: takes an id: u32 and returns a Result<Student, &str> : 
-        Ok(Student) if a student with the given id is found and removed (a String students : instance University 
-        Err("Not found") otherwise
+    Ok(Student) if a student with the given id is found and removed (a String students : instance University 
+    Err("Not found") otherwise
     Display: implement the Display trait for University so that it prints the name and the list of students of the university
 */
 use std::fmt;
@@ -154,7 +154,7 @@ impl fmt::Display for University
 
 
 /*
-    Write a struct AirFleet that contains a vector of Airplane. Airplane is a struct that contains a company (An enum called AirplaneCompany with options: 
+    5. Write a struct AirFleet that contains a vector of Airplane. Airplane is a struct that contains a company (An enum called AirplaneCompany with options: 
     Airbus or Boeing) and a model (String). Implement the following methods for AirFleet :
     remove_boeing : remove all the airplanes of the company Boeing from the fleet
     add_airplane : add an airplane to the fleet
@@ -204,7 +204,7 @@ impl AirFleet
 
 
 /*
-    create the module hashmaps that contains a struct Maps with a field map of type HashMap<Unumber, String>
+    6. create the module hashmaps that contains a struct Maps with a field map of type HashMap<Unumber, String>
     create the module unumber that contains a type Unumber = usize
     In another module create a function string_to_tuple that takes a Maps and returns a HashMap<Unumber, (Unumber, String)>
     the function should convert the HashMap<Unumber, String> to a HashMap<Unumber, (Unumber, String)>
@@ -246,12 +246,13 @@ pub mod another
     }
 }
 
+use unumber::Unumber;
 use hashmaps::Maps;
 use another::string_to_tuple;
 
 
 /*
-    write a struct Size that has two fields: width and height, both of type f32.
+    7. write a struct Size that has two fields: width and height, both of type f32.
     Then, implement the following methods for Size:
     - new: takes two f32 arguments and returns a Size instance
     - area: takes a reference to self and returns the area of the Size instance
@@ -298,7 +299,7 @@ impl Size
 
 
 /*
-    write a struct `MaybePoint` that has two fields: `x` and `y`, both of type
+    8. write a struct `MaybePoint` that has two fields: `x` and `y`, both of type
     `Option<i32>`. Then, implement the following methods for `MaybePoint`:
     - new: takes two `Option<i32>` arguments and returns a `MaybePoint` instance
     - is_some: takes a reference to self and returns `true` if both `x` and `y`
@@ -341,7 +342,7 @@ impl MaybePoint
 
 
 /*
-    Write a function `res1` that takes an `i32` and returns a `Result<i32, String>`. The
+    9. Write a function `res1` that takes an `i32` and returns a `Result<i32, String>`. The
     function returns `OkNo` if `n` is divisible by 10, `Err("error")` otherwise.
     Then write a function `res2` that takes a `Result<i32, &str>` and returns a `Result<i32, String>`.
     The function returns `OkNo` if `n` is divisible by 5, `Err("error")` otherwise.
@@ -378,7 +379,7 @@ fn wrapper(n: i32) -> Result<i32, String> {
 
 
 /*
-    create a function order that take a vector of strings and returns a vector of strings,
+    10. create a function order that take a vector of strings and returns a vector of strings,
     where each string is prepended by its index in the vector followed by a dash and a space.
     For example, given the vector ["How", "Are", "You"] the function should return ["0 - How", "1 - Are", "2 - You"].
 */
@@ -394,7 +395,7 @@ fn order(v: Vec<String>) -> Vec<String> {
 
 
 /*
-    Define two `enum`s both called `X`, place them in two different modules, `modx` and `mody`. Define the `enum`s like this:
+    11. Define two `enum`s both called `X`, place them in two different modules, `modx` and `mody`. Define the `enum`s like this:
     - With 2 variants `S` with a `char` and `C` with a `String`
     - With 1 variant `F` with a `f64` and a `usize`
     Write a function `sum` in the module `modsum` that takes a `X` from `modx` and a `X` from `mody`, 
