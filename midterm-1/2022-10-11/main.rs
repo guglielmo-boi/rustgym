@@ -307,10 +307,7 @@ fn removeelfromvector(v: &mut Vec<String>, n: usize) {
     }
 }
 
-pub fn main(){
-    let mut v: Vec<String> = vec![String::from("what");4];
-    v.push(String::from("now"));    v.push(String::from("what"));
-    println!("{:?}",v);
-    removeelfromvector(&mut v, 3);
-    println!("{:?}",v);
+pub fn main()
+{
+    
 }
