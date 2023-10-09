@@ -324,11 +324,7 @@ impl MaybePoint
     }
 
     fn is_some(&self) -> bool {
-        if self.x.is_some() && self.y.is_some() {
-            true
-        } else {
-            false
-        }
+        self.x.is_some() && self.y.is_some()
     }
 
     fn maybe_len(&self) -> Option<f32> {
