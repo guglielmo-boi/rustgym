@@ -66,14 +66,12 @@ pub mod modfun
     use structx; 
 
     pub fn longer(enumx_x: &enumx::X, structx_x: &structx::X) -> usize {
-        match enumx_x {
-            enumx::X::Y(s) => {
-                if s.len() > structx_x.i.len() {
-                    s.len()
-                } else {
-                    structx_x.i.len()
-                }
-            }
+        let enumx::X::Y(s) = enumx_x;
+
+        if s.len() > structx_x.i.len() {
+            s.len()
+        } else {
+            structx_x.i.len()
         }
     }
 }
