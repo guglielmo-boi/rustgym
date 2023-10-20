@@ -1,4 +1,7 @@
-*.vscode
-*.idea
+.vscode/
+.idea/
+target/
+
 *.exe
 *.out
+*.lock
