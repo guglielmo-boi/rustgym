@@ -392,6 +392,99 @@ fn sum_area(elements: &[&dyn GetArea]) -> Area {
     ret
 }
 
+
+/*
+    7. Create a function 'skip_prefix' that, given non mutable references to  telephone_number:
+    &str  and  prefix: &str , returns  &str . The function removes the prefix from the
+    number, and if there isn't the prefix contained at the start of  number, return  number
+    itself.
+*/
+fn skip_prefix<'a, 'b: 'a>(telephone_number: &'b str, prefix: &'b str) -> &'a str {
+    if prefix.len() <= telephone_number.len() {
+        if telephone_number.find(prefix).is_some() {
+            return &telephone_number[prefix.len()..telephone_number.len()];
+        }
+    }
+
+    telephone_number
+}
+
+
+/*
+    8. Create a struct  Chair  that has two fields:  color: &str  and  quantity: &usize . Create
+    another structure  Wardrobe  that has the same fields of  Chair . Create a trait  Object
+    that has two function declarations:  build  that has  &self  as argument and returns a
+    &str ;  get_quantity  that has  &self  as argument and return a  String .
+    Then, implement the trait  Object  for  Chair  and  Wardrobe .
+    build  should return a  &str  with "Chair/Wardobe has been built"
+    get_quantity  should return a formatted message with the number of
+    chairs/wardrobes.
+    Implement also the Display trait for Chair and Wardrobe, that returns a different
+    formatted message if there are zero, one or two or more chairs/wardrobes.
+    The message should also contain the color of the objects if there are one or more.
+*/
+struct Chair<'a> 
+{
+    color: &'a str,
+    quantity: &'a usize
+}
+
+impl<'a, 'b: 'a> Object for Chair<'b>
+{
+    fn build(&self) -> &str {
+        "Chair has been built"
+    }
+
+    fn get_quantity(&self) -> String {
+        format!("chairs quantity: {}", self.quantity)
+    }
+}
+
+impl<'a> fmt::Display for Chair<'a>
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self.quantity {
+            0 => write!(f, "There are no chairs"),
+            1 => write!(f, "There is only one {} chair", self.color),
+            _ => write!(f, "There are {} {} chairs", self.quantity, self.color)
+        }
+    }
+}
+struct Wardrobe<'a>
+{
+    color: &'a str,
+    quantity: &'a usize
+}
+
+impl<'a, 'b: 'a> Object for Wardrobe<'b>
+{
+    fn build(&self) -> &str {
+        "Wardrobe has been built"
+    }
+
+    fn get_quantity(&self) -> String {
+        format!("wardrobes quantity: {}", self.quantity)
+    }
+}
+
+impl<'a> fmt::Display for Wardrobe<'a>
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self.quantity {
+            0 => write!(f, "There are no wardrobes"),
+            1 => write!(f, "There is only one {} wardrobe", self.color),
+            _ => write!(f, "There are {} {} wardrobes", self.quantity, self.color)
+        }
+    }
+}
+
+trait Object
+{
+    fn build(&self) -> &str;
+    fn get_quantity(&self) -> String;   
+}
+
+
 fn main()
 {
     println!("{:?}", find_equal(&"banana", &"anna"));
@@ -402,4 +495,6 @@ fn main()
     let child = Person::new(String::from("Child"), Some(&father), Some(&mother));
 
     println!("{:?}", child.find_roots());
+
+    println!("{}", skip_prefix("+39123456789", "+39"));
 }

@@ -325,7 +325,7 @@ pub mod point
 
 pub mod line
 {
-    use point::Point;
+    use crate::point::Point;
 
     pub struct Line 
     {
@@ -400,7 +400,7 @@ pub mod sentence
 pub mod test
 {
     use std::collections::HashMap;
-    use sentence::Sentence;
+    use crate::sentence::Sentence;
 
     pub fn magic_sentence(map: &HashMap<i32, Sentence>, i: i32, j: i32) -> Result<Sentence, &str> {
         let a = map.get(&i);

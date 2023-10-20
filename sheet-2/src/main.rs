@@ -287,7 +287,7 @@ fn main()
     vec.push(Foo::Num(10));
     vec.push(Foo::Str(String::from("apple")));
 
-    let e1 = Expression::Operation(Box::new(Expression::Number(10)), Box::new(Expression::Number(15)), Operator::Add);
+    let expression = Expression::Operation(Box::new(Expression::Number(10)), Box::new(Expression::Number(15)), Operator::Add);
     let result = evaluate_expression(Expression::Operation(Box::new(expression), Box::new(Expression::Number(2)), Operator::Mul));
     println!("{:?}", result);
 }
