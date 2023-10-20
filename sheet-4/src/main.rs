@@ -2,6 +2,8 @@ use rand::Rng;
 use std::fmt;
 use std::ops::Add;
 use std::ops::Sub;
+use std::collections::LinkedList;
+use std::collections::HashMap;
 
 /*
     1. Write a function  find_equal, that takes two  &str  as input  s1  and  s2. The function
@@ -177,35 +179,42 @@ struct DoubleRef<'a, 'b: 'a, T>
 
 
 /*
-    5.
-    Write a trait Split that has one generic type ReturnType. the trait has one method split
+    5. Write a trait Split that has one generic type ReturnType. the trait has one method split
     that take a immutable reference to  self  and return a tuple (ReturnType, ReturnType).
     the function split the element of the trait in half.
     Implement the trait for:
     String , where  split  returns  (&str, &str)
-    [&i32] , where  split  returns  (&[i32], &[i32])
+    &[i32] , where  split  returns  (&[i32], &[i32])
     LinkedList<f64> , where  split  returns  (LinkedList<f64>, LinkedList<f64>)
 */
-// trait Split<ReturnType>
-// {
-//     fn split(&mut self) -> (ReturnType, ReturnType);
-// }
+trait Split<'a, ReturnType>
+{
+    fn split(&'a mut self) -> (ReturnType, ReturnType);
+}
 
-// impl Split<String> for String
-// {
-//     fn split(&mut self) -> (String, String) {
-//         let mid = self.len() / 2;
-//         (String::from(&self[0..mid]), String::from(&self[mid..self.len()]))
-//     }    
-// }
+impl<'a> Split<'a, &'a str> for String
+{
+    fn split(&'a mut self) -> (&'a str, &'a str) {
+        let mid = self.len() / 2;
+        (&self[0..mid], &self[mid..self.len()])
+    }    
+}
 
-// impl Split<&[i32]> for &[i32]
-// {
-//     fn split(&mut self) -> (&[i32], &[i32]) {
-//         let mid = self.len() / 2;
-//         (&self[0..mid], &self[mid..self.len()])
-//     }    
-// }
+impl<'a, 'b: 'a> Split<'a, &'a [i32]> for &'b [i32]
+{
+    fn split(&mut self) -> (&'a [i32], &'a [i32]) {
+        let mid = self.len() / 2;
+        (&self[0..mid], &self[mid..self.len()])
+    }    
+}
+
+impl<'a, 'b: 'a> Split<'a, LinkedList<f64>> for LinkedList<f64>
+{
+    fn split(&mut self) -> (LinkedList<f64>, LinkedList<f64>) {
+        let mid = self.len() / 2;
+        (self.clone().into_iter().take(mid).collect(), self.clone().into_iter().skip(mid).collect())
+    }    
+}
 
 
 /*
@@ -482,6 +491,201 @@ trait Object
 {
     fn build(&self) -> &str;
     fn get_quantity(&self) -> String;   
+}
+
+
+/*
+    Create a simple permission manager for certain actions on an Operating System.
+    Create an enum  Role  that has the following fields:  GUEST, USER, ADMIN . Create another
+    enum called  Permission  with the following fields:  READ, WRITE, EXECUTE . For these
+    enums derive the trait  PartialEq ,  Eq  and, for Permission,  Hash . You'll need them later
+    for some comparison and for using the enum Permission as a key of an HashMap.
+    Create a struct  Actions  that has the field  action: String  and  permission:
+    HashMap<Permission, bool> .
+    Create then the struct  User  with these fields:  name: String ,  role: Role ,  actions:
+    Vec<Actions>
+    Write the trait  Auth  with the following methods:
+    check_permission  with arguments  &self ,  action: &str ,  permission_type:
+    &Permission  and returns a bool. This method checks if there is an action in self with
+    as a name the string passed in the arguments. If it exists return if the
+    permission_type for that action is true or false. If this action doesn't exist in self,
+    then return false
+    can_write  with arguments  &self  and  string &str  and returns a bool. This
+    method use  check_permission  and checks if an actions identified with the string
+    argument is writeable.
+    can_read  with arguments  &self  and  string &str  and returns a bool. This method
+    use  check_permission  and checks if an actions identified with the string argument
+    is readable.
+    can_execute  with arguments  &self  and  string &str  and returns a bool. This
+    method use  check_permission  and checks if an actions identified with the string
+    argument is executable
+    Apply the trait  Auth  for  User , and write the relative methods implementations.
+    Implement the  Default  trait for Actions. Write the method  default  that return  Self  and
+    set the action field with an empty string and the permission field with an hashmap that
+    contains as keys the Permission values  READ, WRITE, EXECUTE , and, as values, all set
+    to  false .
+    Create the method  new  for Actions, that, given the arguments  action: String ,  read:
+    bool ,  write: bool  and  execute: bool , return Self. In this method, create a new Self,
+    setting the action field to  action  argument and the  permission  field with the key-value
+    pairs corresponding to the three Permission values ( READ, WRITE, EXECUTE ) and the
+    relative bool passed as arguments.
+    Implement the  Default  trait for User. Write the method  default  that return  Self  and
+    set the name field with the string "Guest", the Role with GUEST and the actions field as
+    a new vector.
+    Create also the method  change_role  for  User  that take a mutable reference to self and
+    the argument  role: Role , and return  Result<(), String>
+    This method should
+    change the User's role as the one passed in the argument if the user is  ADMIN ,
+    returning an  Ok(())
+    otherwise if the user is  USER  its role can be modified to  GUEST  or it can remain
+    USER , returning an  Ok(()) , but cannot be changed to  ADMIN . In this last case it
+    should return a  Err()  with an error message
+    Lastly if the user is  GUEST  its role cannot be changed, can be only re-set to  GUEST ,
+    returning an  Ok(()) . Otherwise, it should return a  Err()  with an error message
+    Create the function  sudo_change_permission  that takes as arguments  user: User ,
+    string: String ,  permission: Permission  and  value: bool .
+    This function should change the user permission for the action specified in the  string
+    argument.
+*/
+#[derive(PartialEq, Eq)]
+enum Role 
+{
+    ADMIN,
+    USER,
+    GUEST
+}
+
+#[derive(PartialEq, Eq, Hash)]
+enum Permission
+{
+    READ,
+    WRITE,
+    EXECUTE
+}
+
+struct Action
+{
+    action: String,
+    permissions: HashMap<Permission, bool>
+}
+
+impl Action
+{
+    fn new(action: String,  read: bool, write: bool, execute: bool) -> Action {
+        Action {
+            action: action,
+            permissions: HashMap::from([(Permission::READ, read), (Permission::WRITE, write), (Permission::EXECUTE, execute)])
+        }
+    }
+}
+
+impl Default for Action
+{
+    fn default() -> Action {
+        Action {
+            action: String::new(),
+            permissions: HashMap::from([(Permission::READ, false), (Permission::WRITE, false), (Permission::EXECUTE, false)])
+        }
+    }
+}
+
+struct User
+{
+    name: String,
+    role: Role,
+    actions: Vec<Action>
+}
+
+impl User
+{
+    fn check_action(&self, action: &str) -> bool{
+        self.actions.iter().find(|a| action == a.action).is_some()
+    }
+
+    fn change_role(&mut self, role: Role) -> Result<(), String> {
+        match self.role {
+            Role::ADMIN => self.role = role,
+            Role::USER => {
+                match role {
+                    Role::ADMIN => return Err(String::from("USER can't upgrade to ADMIN")),
+                    _ => self.role = role
+                }
+            },
+            Role::GUEST => {
+                match role {
+                    Role::ADMIN => return Err(String::from("GUEST can't upgrade to ADMIN")),
+                    Role::USER => return Err(String::from("GUEST can't upgrade to USER")),
+                    _ => self.role = role
+                }
+            }
+        }
+
+        Ok(())
+    }
+}
+
+impl Default for User
+{
+    fn default() -> User {
+        User {
+            name: String::from("Guest"),
+            role: Role::GUEST,
+            actions: Vec::new()
+        }
+    }
+}
+
+
+impl Auth for User
+{
+    
+
+    fn check_permission(&self, action: &str, permission_type: &Permission) -> bool {
+        let action = self.actions.iter().find(|a| action == a.action);
+
+        match action {
+            Some(a) => {
+                let permission = a.permissions.get(permission_type);
+
+                match permission {
+                    Some(b) => *b,
+                    None => false
+                }
+            }
+            None => false
+        }
+    }
+
+    fn can_read(&self, action: &str) -> bool {
+        self.check_permission(action, &Permission::READ) && self.check_action(action)
+    }
+
+    fn can_write(&self, action: &str) -> bool {
+        self.check_permission(action, &Permission::WRITE) && self.check_action(action)
+    }
+
+    fn can_execute(&self, action: &str) -> bool {
+        self.check_permission(action, &Permission::EXECUTE) && self.check_action(action)
+    }
+}
+
+trait Auth
+{
+    fn check_permission(&self, action: &str, permission_type: &Permission) -> bool;
+    fn can_read(&self, action: &str) -> bool;
+    fn can_write(&self, action: &str) -> bool;
+    fn can_execute(&self, action: &str) -> bool;
+}
+
+fn sudo_change_permission(user: &mut User, action: String, permission: Permission, value: bool) {
+    let action = user.actions.iter_mut().find(|a| action == a.action);
+
+    match action {
+        Some(a) => {
+            a.permissions.insert(permission, value);
+        },
+        None => { }
+    }
 }
 
 
