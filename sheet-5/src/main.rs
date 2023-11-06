@@ -1,5 +1,10 @@
 use std::fmt::Debug;
 use std::fmt::Display;
+use std::ops::Add;
+use std::ops::Sub;
+use std::ops::Mul;
+use std::slice;
+use std::marker::PhantomData;
 
 /* 
     1. Define a trait Printable  that defines a method print  that printlns self  to the console.
@@ -190,8 +195,275 @@ impl Tasks
 
 
 /*
-
+    5. Define the struct Pair(i32, String)  and then implement the traits contained in std::ops
+    and needed for adding the possibility to do the following operations, every operation must
+    return another Pair:
+    Pair  + Pair : like doing Pair1 + Pair2.0 + Pair2.1
+    Pair  - Pair : same as above
+    Pair  + i32 : add the i32  to Pair.0
+    Pair  - i32 : same as above
+    Pair  + &str : append the &str  to Pair.1
+    Pair  - &str : search the &str  in Pair.1  and replace it with ""
+    Pair  * u32 : with n the u32, Pair.0  to the nth power, Pair.1  repeated n times.
 */
+struct Pair(i32, String);
+
+impl Add<Pair> for Pair
+{
+    type Output = Pair;
+
+    fn add(self, other: Pair) -> Pair {
+        let mut string = self.1;
+        string.push_str(&other.1);
+
+        Pair(self.0 + other.0, string)
+    }
+}
+
+impl Add<i32> for Pair
+{
+    type Output = Pair;
+
+    fn add(self, other: i32) -> Pair {
+        Pair(self.0 + other, self.1)
+    }
+}
+
+impl Add<&str> for Pair
+{
+    type Output = Pair;
+
+    fn add(self, other: &str) -> Pair {
+        let mut string = self.1;
+        string.push_str(other);
+
+        Pair(self.0, string)
+    }
+}
+
+impl Sub<Pair> for Pair
+{
+    type Output = Pair;
+
+    fn sub(self, other: Pair) -> Pair {
+        let mut string = self.1;
+        string = string.replace(&other.1, "");
+
+        Pair(self.0 - other.0, string)
+    }
+}
+
+impl Sub<i32> for Pair
+{
+    type Output = Pair;
+
+    fn sub(self, other: i32) -> Pair {
+        Pair(self.0 + other, self.1)
+    }
+}
+
+impl Sub<&str> for Pair
+{
+    type Output = Pair;
+
+    fn sub(self, other: &str) -> Pair {
+        let mut string = self.1;
+        string = string.replace(other, "");
+
+        Pair(self.0, string)
+    }
+}
+
+impl Mul<u32> for Pair
+{
+    type Output = Pair;
+
+    fn mul(self, other: u32) -> Pair {
+        let mut string = String::new();
+        for i in 0..other {
+            string.push_str(&self.1);
+        }
+
+        Pair(self.0.pow(other), string)
+    }
+}
+
+
+/*
+    6. Write a struct Gate generic over S that represents the state of the gate:
+    Open
+    Closed
+    Stopped, with a field reason: String
+    The gate can be in one of these states at any given time. Each state has a dierent set of
+    available methods:
+    Open: close
+    Closed: open
+    Stopped: open, close
+    Each method takes ownership of self.
+    The close  method returns a Result:
+    Ok<Gate<Closed>>  if the gate was successfully closed
+    Err<Gate<Stopped>>  if the gate could not be closed
+    The open  method returns a Result:
+    Ok<Gate<Open>>  if the gate was successfully opened
+    Err<Gate<Stopped>>  if the gate could not be opened
+    The open  and close  methods of the Open  and Closed  states have a random chance of
+    failing (user defined).
+    The open  and close  methods of the Stopped  state always succeed.
+*/
+
+
+
+/*
+    Define two traits Heatable  and Friable  that have one method each named cook . Then
+    define the trait Heater  and Frier  that have respectively two methods: heat  and fry ,
+    where each method will take a reference to self  and a trait object of Heatable  and
+    Friable .
+    Then create two "cooker" structs:
+    Oven  that implements Heater  that simply calls the method cook  of the Heatable
+    trait.
+    Pan  that implements Heater  and Frier , the implementation is the same as above for
+    each trait.
+    Then create two "food" structs:
+    Pie  that has one bool field ready
+    Carrot  that has one field of type CarrotState
+    CarrotState  is an enum  that has 4 variants: Raw , Cooked , Fried , Burnt .
+    Define the trait Edible  that defines the method eat . Now implement the following traits:
+    Heatable  for Pie : if the pie is already ready it prints "you burned the pie!", otherwise it
+    sets ready  to true;
+    Heatable  for Carrot : if the carrot is not raw, then the carrot is burnt otherwise the
+    carrot is cooked.
+    Friable  for Carrot : if the carrot is already fried, the carrot is burnt otherwise the
+    carrot is fried.
+    Edible  for Pie : if the pie isn't ready it prints "you got stomach ache" otherwhise
+    "yummy"
+    Edible  for Carrot : it prints,
+    "mmh, crunchy" if it's raw;
+    "mmh, yummy" if it's cooked;
+    "mmh, crispy" if it's fried;
+    "mmh, burnt" if it's burnt;
+*/
+trait Heatable
+{
+    fn cook(&mut self);
+}
+
+trait Friable
+{
+    fn cook(&mut self);
+}
+
+trait Heater
+{
+    fn heat(&self, heatable: &mut dyn Heatable);
+}
+
+trait Frier
+{
+    fn fry(&self, friable: &mut dyn Friable);
+}
+
+trait Edible
+{
+    fn eat(&self);
+}
+
+struct Oven {}
+
+impl Heater for Oven
+{
+    fn heat(&self, heatable: &mut dyn Heatable) {
+        heatable.cook();
+    }
+}
+
+struct Pan {}
+
+impl Heater for Pan
+{
+    fn heat(&self, heatable: &mut dyn Heatable) {
+        heatable.cook();
+    }
+}
+
+impl Frier for Pan
+{
+    fn fry(&self, friable: &mut dyn Friable) {
+        friable.cook();
+    }
+}
+
+struct Pie
+{
+    ready: bool
+}
+
+impl Heatable for Pie
+{
+    fn cook(&mut self) {
+        if self.ready {
+            println!("You burned the pie!");
+        } else {
+            self.ready = true;
+        }
+    }
+}
+
+impl Edible for Pie 
+{
+    fn eat(&self) {
+        if self.ready {
+            println!("Yummy!");
+        } else {
+            println!("You got stomac ache!");
+        }
+    }
+}
+
+enum CarrotState
+{
+    Raw,
+    Cooked,
+    Fried,
+    Burnt
+}
+
+struct Carrot
+{
+    state: CarrotState
+}
+
+impl Heatable for Carrot
+{
+    fn cook(&mut self) {
+        match self.state {
+            CarrotState::Raw => self.state = CarrotState::Cooked,
+            _ => self.state = CarrotState::Burnt
+        }
+    }
+}
+
+impl Friable for Carrot
+{
+    fn cook(&mut self) {
+        match self.state {
+            CarrotState::Raw => self.state = CarrotState::Fried,
+            _ => self.state = CarrotState::Burnt
+        }
+    }
+}
+
+impl Edible for Carrot
+{
+    fn eat(&self) {
+        match self.state {
+            CarrotState::Raw => println!("mmh, crunchy!"),
+            CarrotState::Cooked => println!("mmh, yummy!"),
+            CarrotState::Fried => println!("mmh, crispy!"),
+            CarrotState::Burnt => println!("mmh, burnt!")
+        }
+    }
+}
+
 
 fn main() 
 {
