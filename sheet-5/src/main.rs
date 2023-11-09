@@ -1,10 +1,7 @@
 use std::fmt::Debug;
 use std::fmt::Display;
-use std::ops::Add;
-use std::ops::Sub;
-use std::ops::Mul;
-use std::slice;
-use std::marker::PhantomData;
+use std::ops::{Add, Sub, Mul};
+use rand::{self, Rng};
 
 /* 
     1. Define a trait Printable  that defines a method print  that printlns self  to the console.
@@ -193,6 +190,14 @@ impl Tasks
     }
 }
 
+impl Iterator for Tasks {
+    type Item = Task;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.tasks.iter().position(|t| !t.done).map(|i| self.tasks.remove(i))
+    }
+}
+
 
 /*
     5. Define the struct Pair(i32, String)  and then implement the traits contained in std::ops
@@ -310,11 +315,81 @@ impl Mul<u32> for Pair
     failing (user defined).
     The open  and close  methods of the Stopped  state always succeed.
 */
+struct Open;
 
+struct Closed;
+
+struct Stopped;
+
+struct Gate<S> {
+    _state: S
+}
+
+impl Gate<Open> {
+    pub fn new() -> Gate<Open> {
+        Gate {
+            _state: Open
+        }
+    }
+
+    pub fn close(&self) -> Result<Gate<Closed>, Gate<Stopped>> {
+        let r = rand::thread_rng().gen_range(1..100);
+
+        match r {
+            1..=80 => Ok(Gate {
+                _state: Closed
+            }),
+            _ => Err(Gate {
+                _state: Stopped
+            })
+        }
+    }
+}
+
+impl Gate<Closed> {
+    pub fn new() -> Gate<Closed> {
+        Gate {
+            _state: Closed
+        }
+    }
+
+    pub fn open(&self) -> Result<Gate<Open>, Gate<Stopped>> {
+        let r = rand::thread_rng().gen_range(1..100);
+
+        match r {
+            1..=80 => Ok(Gate {
+                _state: Open
+            }),
+            _ => Err(Gate {
+                _state: Stopped
+            })
+        }
+    }
+}
+
+impl Gate<Stopped> {
+    pub fn new() -> Gate<Stopped> {
+        Gate {
+            _state: Stopped
+        }
+    }
+
+    pub fn open(&self) -> Gate<Open> {
+        Gate {
+            _state: Open
+        }
+    }
+
+    pub fn close(&self) -> Gate<Closed> {
+        Gate {
+            _state: Closed
+        }
+    }
+}
 
 
 /*
-    Define two traits Heatable  and Friable  that have one method each named cook . Then
+    7. Define two traits Heatable  and Friable  that have one method each named cook . Then
     define the trait Heater  and Frier  that have respectively two methods: heat  and fry ,
     where each method will take a reference to self  and a trait object of Heatable  and
     Friable .

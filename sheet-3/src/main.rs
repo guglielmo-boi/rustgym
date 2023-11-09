@@ -120,10 +120,10 @@ impl Coin
 {
     fn to_cents(&self) -> u32 {
         match self {
-            TwentyCents => 20,
-            FiftyCents => 50,
-            OneEuro => 100,
-            TwoEuros => 200
+            Coin::TwentyCents => 20,
+            Coin::FiftyCents => 50,
+            Coin::OneEuro => 100,
+            Coin::TwoEuros => 200
         }
     }
 }
@@ -159,10 +159,10 @@ impl VendingMachine
 
     fn get_item_price(item: &Item) -> u32 {
         match item {
-            Water => 50,
-            Coffee => 70,
-            Coke => 150,
-            Juice => 100
+            Item::Water => 50,
+            Item::Coffee => 70,
+            Item::Coke => 150,
+            Item::Juice => 100
         }
     }
 
