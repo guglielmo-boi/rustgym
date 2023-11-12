@@ -321,11 +321,13 @@ struct Closed;
 
 struct Stopped;
 
-struct Gate<S> {
+struct Gate<S>
+{
     _state: S
 }
 
-impl Gate<Open> {
+impl Gate<Open> 
+{
     pub fn new() -> Gate<Open> {
         Gate {
             _state: Open
@@ -346,7 +348,8 @@ impl Gate<Open> {
     }
 }
 
-impl Gate<Closed> {
+impl Gate<Closed>
+{
     pub fn new() -> Gate<Closed> {
         Gate {
             _state: Closed
@@ -367,7 +370,8 @@ impl Gate<Closed> {
     }
 }
 
-impl Gate<Stopped> {
+impl Gate<Stopped>
+{
     pub fn new() -> Gate<Stopped> {
         Gate {
             _state: Stopped
