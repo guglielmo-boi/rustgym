@@ -447,12 +447,10 @@ fn main()
         shipment_date: Date(07, 10, 2023),
         shipment_hour: Hour(14, 33)
     };
-
     println!("{}", boxShipping);
     println!("{:?}", boxShipping);
 
     let mut librarySystem = LibrarySystem::new();
-
     let book = Book {
         paperItem: PaperItem {
             name: String::from("Book"),
@@ -462,7 +460,6 @@ fn main()
         author: String::from("Guglielmo"),
         publishing_company: String::from("Unitn")
     };
-
     librarySystem.add_book(book);
     println!("{}", librarySystem);
 

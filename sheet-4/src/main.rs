@@ -692,13 +692,13 @@ fn sudo_change_permission(user: &mut User, action: String, permission: Permissio
 fn main()
 {
     println!("{:?}", find_equal(&"banana", &"anna"));
+
     println!("{:?}", lucky_slice(&"guglielmo"));
 
     let father = Person::new(String::from("Father"), None, None);
     let mother = Person::new(String::from("Mother"), None, None);
     let child = Person::new(String::from("Child"), Some(&father), Some(&mother));
-
     println!("{:?}", child.find_roots());
-
+    
     println!("{}", skip_prefix("+39123456789", "+39"));
 }

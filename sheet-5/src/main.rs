@@ -188,9 +188,14 @@ impl Tasks
             tasks: Vec::new()
         }
     }
+
+    fn add(&mut self, task: Task) {
+        self.tasks.push(task)
+    }
 }
 
-impl Iterator for Tasks {
+impl Iterator for Tasks 
+{
     type Item = Task;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -546,5 +551,15 @@ impl Edible for Carrot
 
 fn main() 
 {
-
+    let mut tasks = Tasks::new();
+    let t1 = Task::new(String::from("t1"), 1);
+    let mut t2 = Task::new(String::from("t2"), 2);
+    t2.done = true;
+    let t3 = Task::new(String::from("t3"), 3);
+    tasks.add(t1);
+    tasks.add(t2);
+    tasks.add(t3);
+    for task in tasks.into_iter() {
+        println!("{}", task.name);
+    }
 }
