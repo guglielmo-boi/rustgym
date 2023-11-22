@@ -3,6 +3,73 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 /*
+    1. Create a struct  TreeNode  generic over  T  that represents a binary tree.
+    It should have a field  value  of type  T  and two optional fields  left  and  right  (they
+    should hold a pointer to another  TreeNode ).
+    Implement:
+    a method  new  that takes a value and returns a new  TreeNode  with the given value
+    and no children.
+    a method  from_vec  that takes a vector of values and returns a  TreeNode  with the
+    given values.
+    a method  insert  that takes a value and inserts it into the tree (follow binary search
+    tree rules).
+*/
+#[derive(Debug)]
+struct TreeNode<T>
+{
+    value: T,
+    left: Option<Box<TreeNode<T>>>,
+    right: Option<Box<TreeNode<T>>>
+}
+
+impl<T: PartialOrd> TreeNode<T>
+{
+    fn new(value: T) -> TreeNode<T> {
+        TreeNode {
+            value: value,
+            left: None,
+            right: None
+        }
+    }
+
+    fn from_vec(vec: &mut Vec<T>) -> Option<Box<TreeNode<T>>> {
+        match vec.len() {
+            0 => None,
+            _ => {
+                let mut ret = TreeNode::new(vec.remove(0));
+                ret.left = Self::from_vec(vec);
+                ret.right = Self::from_vec(vec);
+                
+                Some(Box::new(ret))
+            }
+        }
+    }
+
+    fn insert(&mut self, value: T) {
+        if value < self.value {
+            match &mut self.left {
+                None => {
+                    self.left = Some(Box::new(TreeNode::new(value)))
+                },
+                Some(left) => {
+                    left.insert(value);
+                }
+            }
+        } else {
+            match &mut self.right {
+                None => {
+                    self.right = Some(Box::new(TreeNode::new(value)))
+                },
+                Some(right) => {
+                    right.insert(value);
+                }
+            }
+        }
+    }
+}
+
+
+/*
     2. Create a struct Car with the following fields:
     model: String, year: u32, price: u32, rent: bool.
     Create a struct CarDealer with a field that is a vector of Car .
@@ -323,4 +390,13 @@ fn main()
     bit_0.entangle_with(&mut bit_1);
     bit_0.set();
     println!("{}", bit_1.get());
+
+    let mut tree = TreeNode::from_vec(&mut vec![3, 1, 0, 2, 4]);
+    match tree.as_mut() {
+        Some(t) => {
+            t.insert(6);
+            println!("{:?}", t);
+        },
+        None => {}
+    }
 }
