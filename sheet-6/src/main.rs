@@ -22,7 +22,7 @@ struct TreeNode<T>
     right: Option<Box<TreeNode<T>>>
 }
 
-impl<T: PartialOrd> TreeNode<T>
+impl<T: Ord + Clone> TreeNode<T>
 {
     fn new(value: T) -> TreeNode<T> {
         TreeNode {
@@ -32,13 +32,23 @@ impl<T: PartialOrd> TreeNode<T>
         }
     }
 
+    fn from_vec_rec(ret: &mut TreeNode<T>, vec: &mut[T]) {
+        if !vec.is_empty() {
+            let m = vec.len() / 2;
+            ret.insert(vec[m].clone());
+            TreeNode::from_vec_rec(ret, &mut vec[..m]);
+            TreeNode::from_vec_rec(ret, &mut vec[m + 1..]);
+        }
+    }
+
     fn from_vec(vec: &mut Vec<T>) -> Option<Box<TreeNode<T>>> {
         match vec.len() {
             0 => None,
             _ => {
-                let mut ret = TreeNode::new(vec.remove(0));
-                ret.left = Self::from_vec(vec);
-                ret.right = Self::from_vec(vec);
+                vec.sort();
+                let m = vec.len() / 2;
+                let mut ret = TreeNode::new(vec.remove(m));
+                TreeNode::from_vec_rec(&mut ret, vec);
                 
                 Some(Box::new(ret))
             }
@@ -391,10 +401,9 @@ fn main()
     bit_0.set();
     println!("{}", bit_1.get());
 
-    let mut tree = TreeNode::from_vec(&mut vec![3, 1, 0, 2, 4]);
+    let mut tree = TreeNode::from_vec(&mut vec![3, 1, 0, 2]);
     match tree.as_mut() {
         Some(t) => {
-            t.insert(6);
             println!("{:?}", t);
         },
         None => {}
