@@ -638,8 +638,6 @@ impl Default for User
 
 impl Auth for User
 {
-    
-
     fn check_permission(&self, action: &str, permission_type: &Permission) -> bool {
         let action = self.actions.iter().find(|a| action == a.action);
 
