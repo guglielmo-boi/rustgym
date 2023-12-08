@@ -1,3 +1,4 @@
+use std::ops::Deref;
 use std::rc::Rc;
 use std::cell::RefCell;
 use std::fmt::{Debug, Formatter};
@@ -45,7 +46,6 @@ struct Wrapper
 {
     v: Vec<i32>
 }
-
 
 /*
     3. write a function basicbox_sum that takes a vector of Strings and returns a vector of Boxes of usizes the returned vector 
@@ -175,9 +175,41 @@ impl<T:Debug> Debug for GraphNode<T>
     }
 }
 
+#[derive(Debug)]
 struct Graph<T>
 {
     nodes: Vec<NodeRef<T>>,
+}
+
+impl<T> Graph<T>
+{
+    fn new() -> Graph<T> {
+        Graph {
+            nodes: Vec::new()
+        }
+    }
+}
+
+impl<T: SameBool + PartialOrd> Graph<T>
+{
+    fn add_node(&mut self, node: T) {
+        let mut new_node = Rc::new(RefCell::new(GraphNode {
+            inner_value: node,
+            adjacent: Vec::new()
+        }));
+
+        for node in self.nodes.iter_mut() {
+            if node.borrow().inner_value < new_node.borrow().inner_value {
+                new_node.borrow_mut().adjacent.push(node.clone());
+            }
+
+            if node.borrow().inner_value.samebool(&new_node.borrow().inner_value) {
+                node.borrow_mut().adjacent.push(node.clone());
+            }
+        }
+
+        self.nodes.push(new_node);
+    }   
 }
 
 pub trait SameBool
@@ -199,6 +231,27 @@ impl NodeContent
     }
 }
 
+impl PartialEq for NodeContent
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.i == other.i
+    }
+}
+
+impl PartialOrd for NodeContent
+{
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        self.i.partial_cmp(&other.i)
+    }
+}
+
+impl SameBool for NodeContent
+{
+    fn samebool(&self, other: &Self) -> bool {
+        self.b == other.b
+    }
+}
+
 fn main() 
 {
     let x = 5;
@@ -208,6 +261,13 @@ fn main()
     printdouble(s);
     let y = 8;
     printdouble(y);
+
+    let w = Wrapper{v:vec![11,12,13,14,15,16,17,18]};
+    let mut iw = w.iter();
+    println!("first: {}",iw.next().unwrap());
+    for el in iw{
+        println!("evens: {}",el);
+    }
 
     let s = vec!["nope".to_string(), "game".to_string(), "bananas".to_string()];
     println!("boxed s: {:?}", basicbox_sum(s));
@@ -230,4 +290,49 @@ fn main()
     println!("{:?}",l);
     let s : String = format!("{:?}",l);
     assert_eq!(s.contains("Vec"),false);
+
+    let mut el1 = NodeContent{i:10, b:true};
+    let mut el2 = NodeContent{i:11, b:true};
+    let mut el3 = NodeContent{i:12, b:false};
+    let mut g = Graph::new();
+    println!("{:?}",g);
+    g.add_node(el1);
+    println!("{:?}",g);
+    g.add_node(el2);
+    println!("{:?}",g);
+    g.add_node(el3);
+    println!("{:?}",g);
+
+    let mut el1 = NodeContent{i:10, b:true};
+    let mut el2 = NodeContent{i:8, b:false};
+    let mut g = Graph::new();
+    println!("{:?}",g);
+    g.add_node(el1);
+    println!("{:?}",g);
+    g.add_node(el2);
+    println!("{:?}",g);
+
+    let mut el1 = NodeContent{i:10, b:true};
+    let mut el2 = NodeContent{i:11, b:true};
+    let mut el3 = NodeContent{i:12, b:true};
+    let mut g = Graph::new();
+    println!("{:?}",g);
+    g.add_node(el1);
+    println!("{:?}",g);
+    g.add_node(el2);
+    println!("{:?}",g);
+    g.add_node(el3);
+    println!("{:?}",g);
+
+    let mut el1 = NodeContent{i:10, b:true};
+    let mut el2 = NodeContent{i:9, b:false};
+    let mut el3 = NodeContent{i:8, b:true};
+    let mut g = Graph::new();
+    println!("{:?}",g);
+    g.add_node(el1);
+    println!("{:?}",g);
+    g.add_node(el2);
+    println!("{:?}",g);
+    g.add_node(el3);
+    println!("{:?}",g);
 }
