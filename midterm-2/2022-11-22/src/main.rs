@@ -47,6 +47,29 @@ struct Wrapper
     v: Vec<i32>
 }
 
+struct OddIndexIterator<'a>
+{
+    inner_iter: std::slice::Iter<'a, i32>,
+}
+
+impl Wrapper 
+{
+    fn iter(&self) -> OddIndexIterator {
+        OddIndexIterator {
+            inner_iter: self.v.iter(),
+        }
+    }
+}
+
+impl<'a> Iterator for OddIndexIterator<'a> 
+{
+    type Item = &'a i32;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.inner_iter.next().and_then(|_| self.inner_iter.next())
+    }
+}
+
 /*
     3. write a function basicbox_sum that takes a vector of Strings and returns a vector of Boxes of usizes the returned vector 
     contains all the lengths of the input vector followed by a final element that sums all the previous lengths
