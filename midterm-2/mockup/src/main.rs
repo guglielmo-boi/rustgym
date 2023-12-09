@@ -1,3 +1,4 @@
+use std::collections::VecDeque;
 use std::hash::{Hash, self};
 use std::ops::{Add};
 use std::fmt::{Debug, Display};
@@ -118,10 +119,15 @@ impl BinIter
     fn new(n: u128, l: u32) -> BinIter {
         let mut num = n;
         let mut ret = BinIter{bits: Vec::new(), _index: 0};
+        ret.bits.resize(l as usize, false);
 
-        while num > 0 {
-            ret.bits.push(num % 2 != 0);
+        let mut i: usize = 0;
+
+        while num > 0 && i < l as usize {
+            ret.bits[i] = (num % 2 != 0);
             num /= 2;
+
+            i += 1;
         }
 
         ret
@@ -162,6 +168,8 @@ impl Iterator for BinIter
     dfs , which performs a depth-first search on the graph, starting from the given node. It
     returns a vector of nodes, in the order in which they were visited.
 */
+type NodeRef<T> = Rc<Node<T>>;
+
 #[derive(PartialEq)]
 struct Node<T: Hash + PartialEq + Eq>
 {
@@ -223,6 +231,121 @@ impl<T: Hash + PartialEq + Eq> Graph<T>
     }
 }
 
+
+/*
+    7. Write a trait Task that define a method execute(&self)->usize .
+    implement the Task trait for the following structs:
+    SumTask is a struct with a method new(n1: usize, n2: usize) were executing task returns
+    the sum of n1 and n2
+    LenTask is a struct with a method new(s: String) were executing task returns
+    the len of s
+    Write two structs: Tasker and Executer , that interact following this protocol:
+    At any given time any number of tasker and executer can be linked together.
+    Tasker can ask for a task to be scheduled using the method schedule_task(&mut self, task: ...) that
+    take as input a
+    box with inside an object that implements Task
+    Executer can execute a task using the method execute_task(&mut self)->Option<usize> . this method can
+    fail if no task is scheduled
+    Tasks are executed inf a FIFO queue
+    Tasker has a method new that return am instance with an empty queue, linked to no one.
+    Tasker has a method get_tasker(&self)->Tasker that return a new Tasker linked with self.
+    Tasker has a method get_executer(&self)->Executer that return a new Executer linked with self.
+*/
+trait Task
+{
+    fn execute(&self) -> usize;
+}
+
+struct SumTask
+{
+    n1: usize,
+    n2: usize
+}
+
+impl SumTask
+{
+    fn new(n1: usize, n2: usize) -> SumTask {
+        SumTask {
+            n1,
+            n2
+        }
+    }
+}
+
+impl Task for SumTask
+{
+    fn execute(&self) -> usize {
+        self.n1 + self.n2
+    }
+}
+
+struct LenTask
+{
+    s: String
+}
+
+impl LenTask
+{
+    fn new(s: String) -> LenTask {
+        LenTask {
+            s
+        }
+    }
+}
+
+impl Task for LenTask
+{
+    fn execute(&self) -> usize {
+        self.s.len()
+    }
+}
+
+struct Tasker
+{
+    tasks: Rc<RefCell<VecDeque<Box<dyn Task>>>>
+}
+
+impl Tasker
+{
+    fn new() -> Tasker {
+        Tasker {
+            tasks: Rc::new(RefCell::new(VecDeque::new()))
+        }
+    }
+
+    fn schedule_task(&mut self, task: Box<dyn Task>) {
+        self.tasks.borrow_mut().push_back(task);
+    }
+
+    fn get_tasker(&self) -> Tasker {
+        Tasker {
+            tasks: self.tasks.clone()
+        }
+    }
+
+    fn get_executer(&self) -> Executer {
+        Executer {
+            tasks: self.tasks.clone()
+        }
+    }
+}
+
+struct Executer
+{
+    tasks: Rc<RefCell<VecDeque<Box<dyn Task>>>>
+}
+
+impl Executer
+{
+    fn execute_task(&mut self) -> Option<usize> {
+        if let Some(ret) = self.tasks.borrow_mut().pop_front() {
+            Some(ret.execute())
+        } else {
+            None
+        }
+    }
+}
+
 fn main()
 {
     println!("odd constant: {}",odd_module::CONSTANT);
@@ -280,11 +403,33 @@ fn main()
     n6.clone(),
     n7.clone(),
     ]);
-    let mut paths: Vec<Vec<Rc<Node<i32>>>> = vec![];
+    let mut paths: Vec<Vec<NodeRef<i32>>> = vec![];
     for n in graph.nodes.iter() {
     paths.push(graph.dfs(n.clone()))
     }
     paths.iter().for_each(|path| {
     println!("{:?}", path);
     });
+
+    macro_rules! sum_task {
+        (let $task: ident =$n1: literal + $n2: literal) => {
+            let $task: Box<dyn Task> = Box::new(SumTask::new($n1, $n2));
+        };
+    }
+    macro_rules! len_task {
+        (let $task: ident =$s: literal) => {
+            let $task: Box<dyn Task> = Box::new(LenTask::new($s.to_owned()));
+        };
+    }
+
+    sum_task!(let t1 = 10+1);
+    len_task!(let t2 = "four");
+    let mut tasker1 = Tasker::new();
+    let mut tasker2 = tasker1.get_tasker();
+    let mut executer1 = tasker2.get_executer();
+    let mut executer2 = tasker1.get_executer();
+    tasker1.schedule_task(t1);
+    tasker2.schedule_task(t2);
+    println!("{:?}",executer1.execute_task());
+    println!("{:?}",executer2.execute_task());
 }
