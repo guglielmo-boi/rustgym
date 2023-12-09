@@ -1,5 +1,7 @@
-use std::ops::Add;
+use std::hash::{Hash, self};
+use std::ops::{Add};
 use std::fmt::{Debug, Display};
+
 use std::rc::Rc;
 use std::cell::RefCell;
 
@@ -144,189 +146,81 @@ impl Iterator for BinIter
 
 
 /*
-    5. Implement a doubly linked list
-    Create the necessary structs to represent it
-    - Node<T> with an element of type T and two fields, prev and next, both of type Option<Rc<RefCell<Node<T>>>>.
-    - List<T> with two fields, head and tail, both of type Option<Rc<RefCell<Node<T>>>>, and a size field of type usize.
-    Implement the following traits for Node<T>:
-    - PartialEq that compares the elements of two nodes.
-    - Display that prints the element of a node.
-    Implement the following traits for List<T>:
-    - PartialEq that checks if two lists are equal, by comparing the elements of the nodes, one by one.
-    - Debug that prints the elements of the list.
-    Implement the following methods for List<T>:
-    - new() that creates a new empty list.
-    - print_list(&self) that prints the elements of the list.
-    - push(&mut self, element: T) that adds an element to the front of the list.
-    - pop(&mut self) -> Option<T> that removes an element from the front of the list.
-    - push_back(&mut self, element: T) that adds an element to the back of the list.
-    - pop_back(&mut self) -> Option<T> that removes an element from the back of the list.
+    6. Write the necessary structs to represent an oriented graph generic over T , where T
+    implements Hash , PartialEq and Eq .
+    Node , with a value of type T and a vector of adjacent nodes
+    Graph , with a vector of nodes
+    Then, implement the following methods for Node :
+    new , which creates a new Node with the given value and the given vector of adjacents
+    get_value , which returns a reference to the value of the node
+    Implement Debug for Node , so that it prints the value of the node and the values of its
+    adjacents.
+    For example, if the node has value 1 and its adjacents are 2 and 3 , it should print:
+    [value: 1, adjacents: [2, 3]]
+    Then, implement the following methods for Graph :
+    new , which creates a Graph from a vector of nodes, with the respective adjacents set
+    dfs , which performs a depth-first search on the graph, starting from the given node. It
+    returns a vector of nodes, in the order in which they were visited.
 */
-
-struct Node<T>
+#[derive(PartialEq)]
+struct Node<T: Hash + PartialEq + Eq>
 {
-    element: T,
-    prev: Option<Rc<RefCell<Node<T>>>>,
-    next: Option<Rc<RefCell<Node<T>>>>
+    value: T,
+    adjacents: Vec<Rc<Node<T>>>
 }
 
-impl<T: PartialEq> PartialEq for Node<T>
+impl<T: Hash + PartialEq + Eq> Node<T>
 {
-    fn eq(&self, other: &Self) -> bool {
-        self.element == other.element
+    fn new(value: T, adjacents: Vec<Rc<Node<T>>>) -> Node<T> {
+        Node {
+            value,
+            adjacents
+        }
+    }
+
+    fn get_value(&self) -> &T {
+        &self.value
     }
 }
 
-impl<T: Display> std::fmt::Debug for Node<T>
+impl<T: Hash + PartialEq + Eq + Debug + Copy> Debug for Node<T>
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.element)
+        let adj: Vec<T> = self.adjacents.iter().map(|node| node.value).collect();
+        write!(f, "[value: {:?}, adjacents: \"{:?}\"]", self.value, adj)
     }
 }
 
-struct List<T>
+struct Graph<T: Hash + PartialEq + Eq>
 {
-    head: Option<Rc<RefCell<Node<T>>>>,
-    tail: Option<Rc<RefCell<Node<T>>>>,
-    size: usize
+    nodes: Vec<Rc<Node<T>>>
 }
 
-impl<T: PartialEq> PartialEq for List<T>
+impl<T: Hash + PartialEq + Eq> Graph<T>
 {
-    fn eq(&self, other: &Self) -> bool {
-        if self.size != other.size {
-            false
-        } else {
-            if self.size == 0 {
-                false
-            } else {
-                if let Some(mut self_current) = self.head.clone() {
-                    if let Some(mut other_current) = other.head.clone() {
-                        for _ in 0..self.size {
-                            if *self_current.borrow() != *other_current.borrow() {
-                                return false;
-                            }
-
-                            if let Some(self_next) = self_current.clone().borrow().next.clone() {
-                                self_current = self_next.clone();
-                            }
-
-                            if let Some(other_next) = other_current.clone().borrow().next.clone() {
-                                other_current = other_next.clone();
-                            }
-                        }
-                    } else {
-                        return false;
-                    }
-                } else {
-                    return false;
-                }
-
-                true
-            }
-        }
-    }
-}
-
-impl<T: Display> Debug for List<T>
-{
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if self.size > 0 {
-            if let Some(mut current) = self.head.clone() {
-                for _ in 0..self.size {
-                    println!("{}", current.borrow().element);
-                }
-
-                if let Some(next) = current.clone().borrow().next.clone() {
-                    current = next.clone();
-                }
-            }
-        }
-
-        Ok(())
-    }
-}
-
-impl<T: Display + Clone> List<T>
-{
-    fn new() -> List<T> {
-        List {
-            head: None,
-            tail: None,
-            size: 0
+    fn new(nodes: Vec<Rc<Node<T>>>) -> Graph<T> {
+        Graph {
+            nodes
         }
     }
 
-    fn print_list(&self) {
-        if self.size > 0 {
-            if let Some(mut current) = self.head.clone() {
-                for _ in 0..self.size {
-                    println!("{}", current.borrow().element);
-                }
+    fn dfs_rec(&self, visited: &mut Vec<Rc<Node<T>>>, node: Rc<Node<T>>) {
+        visited.push(node.clone());
 
-                if let Some(next) = current.clone().borrow().next.clone() {
-                    current = next.clone();
-                }
+        for next in node.adjacents.clone().iter() {
+            if !visited.contains(&next) {
+                self.dfs_rec(visited, next.clone());
             }
         }
     }
 
-    fn push(&mut self, element: T) {
-        let new_node = Rc::new(RefCell::new(Node{element, prev: None, next: self.head.clone()}));
-        self.head = Some(new_node.clone());
+    fn dfs(&self, node: Rc<Node<T>>) -> Vec<Rc<Node<T>>> {
+        let mut ret = Vec::new();
 
-        if self.size == 0 {
-            self.tail = Some(new_node.clone());
-        }
+        self.dfs_rec(&mut ret, node);
 
-        self.size += 1;
+        ret
     }
-
-    fn pop(&mut self) -> Option<T> {
-        if let Some(head) = self.head.clone() {
-            let e = head.clone().borrow().element.clone();
-            self.head = head.borrow().next.clone();
-
-            if self.size == 1 {
-                self.tail = None;
-            }
-
-            self.size -= 1;
-
-            return Some(e);
-        }
-
-        None
-    }
-
-    fn push_back(&mut self, element: T) {
-        let new_node = Rc::new(RefCell::new(Node{element, prev: self.tail.clone(), next: None}));
-        self.tail = Some(new_node.clone());
-
-        if self.size == 0 {
-            self.head = Some(new_node.clone());
-        }
-
-        self.size += 1;
-    }
-
-    fn pop_back(&mut self) -> Option<T> {
-        if let Some(tail) = self.tail.clone() {
-            let e = tail.clone().borrow().element.clone();
-            self.tail = tail.borrow().next.clone();
-
-            if self.size == 1 {
-                self.head = None;
-            }
-
-            self.size -= 1;
-
-            return Some(e);
-        }
-
-        None
-    }
-
 }
 
 fn main()
@@ -365,21 +259,32 @@ fn main()
     print!("{}", if n { 1 } else { 0 })
     }
 
-    // let mut list: List<i32> = List::new();
-    // list.push_back(1);
-    // list.push_back(2);
-    // list.push_back(3);
-    // list.print_list();
-    // debug_assert_eq!(list.pop_back(), Some(3));
-    // list.print_list();
-    // debug_assert_eq!(list.pop_back(), Some(2));
-    // list.print_list();
-    // debug_assert_eq!(list.pop_back(), Some(1));
-    // list.print_list();
-    // debug_assert_eq!(list.pop_back(), None);
-    // debug_assert_eq!(list.size, 0);
-    // debug_assert_eq!(list.head, None);
-    // println!("{:?}", list.head);
-    // debug_assert_eq!(list.tail, None);
-    // println!("{:?}", list.tail);
+    let n1 = Rc::new(Node::new(1, vec![]));
+    let n2 = Rc::new(Node::new(2,
+    vec![n1.clone()]));
+    let n3 = Rc::new(Node::new(3, vec![]));
+    let n4 = Rc::new(Node::new(4,
+    vec![n1.clone(), n3.clone()]));
+    let n5 = Rc::new(Node::new(5,
+    vec![n2.clone(), n4.clone()]));
+    let n6 = Rc::new(Node::new(6,
+    vec![n5.clone(), n4.clone()]));
+    let n7 = Rc::new(Node::new(7,
+    vec![n2.clone(), n4.clone()]));
+    let graph = Graph::new(vec![
+    n1.clone(),
+    n2.clone(),
+    n3.clone(),
+    n4.clone(),
+    n5.clone(),
+    n6.clone(),
+    n7.clone(),
+    ]);
+    let mut paths: Vec<Vec<Rc<Node<i32>>>> = vec![];
+    for n in graph.nodes.iter() {
+    paths.push(graph.dfs(n.clone()))
+    }
+    paths.iter().for_each(|path| {
+    println!("{:?}", path);
+    });
 }
