@@ -150,6 +150,261 @@ impl Iterator for BinIter
     }
 }
 
+/*
+    5. Implement a doubly linked list
+    Create the necessary structs to represent it
+    - Node<T> with an element of type T and two fields, prev and next, both of type Option<Rc<RefCell<Node<T>>>>.
+    - List<T> with two fields, head and tail, both of type Option<Rc<RefCell<Node<T>>>>, and a size field of type usize.
+    Implement the following traits for Node<T>:
+    - PartialEq that compares the elements of two nodes.
+    - Display that prints the element of a node.
+    Implement the following traits for List<T>:
+    - PartialEq that checks if two lists are equal, by comparing the elements of the nodes, one by one.
+    - Debug that prints the elements of the list.
+    Implement the following methods for List<T>:
+    - new() that creates a new empty list.
+    - print_list(&self) that prints the elements of the list.
+    - push(&mut self, element: T) that adds an element to the front of the list.
+    - pop(&mut self) -> Option<T> that removes an element from the front of the list.
+    - push_back(&mut self, element: T) that adds an element to the back of the list.
+    - pop_back(&mut self) -> Option<T> that removes an element from the back of the list.
+
+struct Node<T>
+{
+    element: T,
+    prev: Option<Rc<RefCell<Node<T>>>>,
+    next: Option<Rc<RefCell<Node<T>>>>
+}
+
+impl<T> Node<T>
+{
+    fn get_element(&self) -> &T {
+        &self.element
+    }
+
+    fn set_prev(&mut self, node: Option<Rc<RefCell<Node<T>>>>) {
+        self.prev = node;
+    }
+
+    fn set_next(&mut self, node: Option<Rc<RefCell<Node<T>>>>) {
+        self.next = node;
+    }
+}
+
+impl<T: PartialEq> PartialEq for Node<T>
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.element == other.element
+    }
+}
+
+impl<T: Display> std::fmt::Debug for Node<T>
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.element)
+    }
+}
+
+struct List<T>
+{
+    head: Option<Rc<RefCell<Node<T>>>>,
+    tail: Option<Rc<RefCell<Node<T>>>>,
+    size: usize
+}
+
+impl<T: PartialEq> PartialEq for List<T>
+{
+    fn eq(&self, other: &Self) -> bool {
+        if self.size != other.size {
+            false
+        } else {
+            if self.size == 0 {
+                false
+            } else {
+                if let Some(mut self_current) = self.head.clone() {
+                    if let Some(mut other_current) = other.head.clone() {
+                        for _ in 0..self.size {
+                            if *self_current.borrow() != *other_current.borrow() {
+                                return false;
+                            }
+
+                            if let Some(self_next) = self_current.clone().borrow().next.clone() {
+                                self_current = self_next.clone();
+                            }
+
+                            if let Some(other_next) = other_current.clone().borrow().next.clone() {
+                                other_current = other_next.clone();
+                            }
+                        }
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+
+                true
+            }
+        }
+    }
+}
+
+impl<T: Display> Debug for List<T>
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if self.size > 0 {
+            if let Some(mut current) = self.head.clone() {
+                for _ in 0..self.size {
+                    println!("{}", current.borrow().element);
+                
+                    if let Some(next) = current.clone().borrow().next.clone() {
+                        current = next.clone();
+                    }
+                }
+            }
+        }
+
+        Ok(())
+    }
+}
+
+impl<T: Display + Default + Clone> List<T>
+{
+    fn new() -> List<T> {
+        List {
+            head: None,
+            tail: None,
+            size: 0
+        }
+    }
+
+    fn print_list(&self) {
+        if self.size > 0 {
+            if let Some(mut current) = self.head.clone() {
+                for _ in 0..self.size {
+                    println!("{}", current.borrow().element);
+
+                    if let Some(next) = current.clone().borrow().next.clone() {
+                        current = next.clone();
+                    }
+                }
+            }
+        }
+    }
+
+    fn push(&mut self, element: T) {
+        let new_node = Rc::new(RefCell::new(Node{element, prev: None, next: self.head.clone()}));
+
+        if let Some(head) = &mut self.head {
+            head.borrow_mut().set_prev(Some(new_node.clone()));
+        }
+
+        self.head = Some(new_node.clone());
+
+        if self.size == 0 {
+            self.tail = Some(new_node.clone());
+        }
+
+        self.size += 1;
+    }
+
+    fn pop(&mut self) -> Option<T> {
+        if self.size == 0 {
+            None 
+        } else if self.size == 1 {
+            let mut ret = T::default();
+
+            if let Some(head) = &mut self.head {
+                ret = head.borrow_mut().get_element().clone();
+            }
+
+            self.head = None;
+            self.tail = None;
+            self.size -= 1;
+
+            Some(ret)
+        } else {
+            let mut ret = T::default();
+            let mut node = self.head.clone();
+
+            if let Some(head) = &mut self.tail {
+                ret = head.borrow_mut().get_element().clone();
+
+                if let Some(next) = head.borrow_mut().next.clone() {
+                    next.borrow_mut().set_next(None);
+                    node = Some(next.clone());
+                }
+            }
+
+            self.head = node;
+            self.size -= 1;
+
+            Some(ret)
+        }
+    }
+
+    fn push_back(&mut self, element: T) {
+        let new_node = Rc::new(RefCell::new(Node{element, prev: self.tail.clone(), next: None}));
+
+        if self.size == 0 {
+            self.head = Some(new_node.clone());
+            self.tail = Some(new_node.clone());
+        } else if self.size == 1 {
+            if let Some(head) = &mut self.head {
+                head.borrow_mut().set_next(Some(new_node.clone()));
+            }
+
+            self.tail = Some(new_node.clone());
+        } else {
+            if let Some(tail) = &mut self.tail {
+                tail.borrow_mut().set_next(Some(new_node.clone()));
+            }
+
+            self.tail = Some(new_node.clone());
+        }
+
+        self.size += 1;
+    }
+
+    fn pop_back(&mut self) -> Option<T> {
+        if self.size == 0 {
+            None 
+        } else if self.size == 1 {
+            let mut ret = T::default();
+
+            if let Some(head) = &mut self.head {
+                ret = head.borrow_mut().get_element().clone();
+            }
+
+            self.head = None;
+            self.tail = None;
+            self.size -= 1;
+
+            Some(ret)
+        } else {
+            let mut ret = T::default();
+            let mut node = self.tail.clone();
+
+            if let Some(tail) = &mut self.tail {
+                ret = tail.borrow_mut().get_element().clone();
+
+                if let Some(prev) = tail.borrow_mut().prev.clone() {
+                    prev.borrow_mut().set_next(None);
+                    node = Some(prev.clone());
+                }
+            }
+
+            self.tail = node;
+            self.size -= 1;
+
+            Some(ret)
+        }
+
+    }
+
+}
+*/
+
 
 /*
     6. Write the necessary structs to represent an oriented graph generic over T , where T
