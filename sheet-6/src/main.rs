@@ -172,7 +172,7 @@ impl CarDealer
         match user.car.as_ref() {
             Some(c) => {
                 c.as_ref().borrow_mut().rent = false;
-                *user.car.borrow_mut() = None;
+                user.car = None;
             },
             None => {
                 println!("User has no car!");

@@ -495,7 +495,7 @@ trait Object
 
 
 /*
-    Create a simple permission manager for certain actions on an Operating System.
+    9. Create a simple permission manager for certain actions on an Operating System.
     Create an enum  Role  that has the following fields:  GUEST, USER, ADMIN . Create another
     enum called  Permission  with the following fields:  READ, WRITE, EXECUTE . For these
     enums derive the trait  PartialEq ,  Eq  and, for Permission,  Hash . You'll need them later
