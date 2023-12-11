@@ -1,4 +1,3 @@
-use std::borrow::BorrowMut;
 use std::rc::Rc;
 use std::cell::RefCell;
 
@@ -354,15 +353,15 @@ struct EntangledBit
 impl EntangledBit
 {
     fn set(&mut self) {
-        *self.bit.as_ref().borrow_mut() = true
+        *self.bit.borrow_mut() = true
     }
 
     fn reset(&mut self) {
-        *self.bit.as_ref().borrow_mut() = false
+        *self.bit.borrow_mut() = false
     }
 
     fn get(&self) -> bool {
-        *self.bit.as_ref().borrow()
+        *self.bit.borrow()
     }
 
     fn entangle_with(&self, other: &mut EntangledBit) {
