@@ -15,17 +15,17 @@ use std::cell::RefCell;
     the constant inside "odd_module" if "value" is odd. otherwise it returns the constant inside "even_module"
     just to avoid confusion remember that in Italian: odd = dispari, even = pari
 */
-mod odd_module
+pub mod odd_module
 {
     pub const CONSTANT: i32 = 123;
 }
 
-mod even_module
+pub mod even_module
 {
     pub const CONSTANT: i32 = 246;
 }
 
-mod getter_function
+pub mod getter_function
 {
     use crate::{even_module, odd_module};
 
@@ -168,7 +168,7 @@ impl Iterator for BinIter
     - pop(&mut self) -> Option<T> that removes an element from the front of the list.
     - push_back(&mut self, element: T) that adds an element to the back of the list.
     - pop_back(&mut self) -> Option<T> that removes an element from the back of the list.
-
+*/
 struct Node<T>
 {
     element: T,
@@ -403,7 +403,6 @@ impl<T: Display + Default + Clone> List<T>
     }
 
 }
-*/
 
 
 /*
@@ -603,88 +602,5 @@ impl Executer
 
 fn main()
 {
-    println!("odd constant: {}",odd_module::CONSTANT);
-    println!("even constant: {}",even_module::CONSTANT);
-    println!("test function: {}", getter_function::get_constant(105));
-
-    println!("{}",1u8.clone_and_double());
-    println!("{}",1i8.clone_and_double());
-    println!("{}",2u16.clone_and_double());
-    println!("{}",2i16.clone_and_double());
-    println!("{}",3u32.clone_and_double());
-    println!("{}",3i32.clone_and_double());
-    println!("{}",4u64.clone_and_double());
-    println!("{}",4i64.clone_and_double());
-
-    let mut v = get_vec();
-    v.push(Box::new("hiii!".to_string()));
-    v.push(Box::new(-587));
-    v.push(Box::new("xyz".to_string()));
-    v.push(Box::new(vec![4, 5, 6]));
-    print_vec(&v);
-
-    for n in
-    BinIter::new(4641312598359562305508665788689819792,128) {
-    print!("{}", if n { 1 } else { 0 })
-    }
-    println!();
-    for n in BinIter::new(18956403638425120546, 64)
-    {
-    print!("{}", if n { 1 } else { 0 })
-    }
-    println!();
-    for n in BinIter::new(15, 4) {
-    print!("{}", if n { 1 } else { 0 })
-    }
-
-    let n1 = Rc::new(Node::new(1, vec![]));
-    let n2 = Rc::new(Node::new(2,
-    vec![n1.clone()]));
-    let n3 = Rc::new(Node::new(3, vec![]));
-    let n4 = Rc::new(Node::new(4,
-    vec![n1.clone(), n3.clone()]));
-    let n5 = Rc::new(Node::new(5,
-    vec![n2.clone(), n4.clone()]));
-    let n6 = Rc::new(Node::new(6,
-    vec![n5.clone(), n4.clone()]));
-    let n7 = Rc::new(Node::new(7,
-    vec![n2.clone(), n4.clone()]));
-    let graph = Graph::new(vec![
-    n1.clone(),
-    n2.clone(),
-    n3.clone(),
-    n4.clone(),
-    n5.clone(),
-    n6.clone(),
-    n7.clone(),
-    ]);
-    let mut paths: Vec<Vec<NodeRef<i32>>> = vec![];
-    for n in graph.nodes.iter() {
-    paths.push(graph.dfs(n.clone()))
-    }
-    paths.iter().for_each(|path| {
-    println!("{:?}", path);
-    });
-
-    macro_rules! sum_task {
-        (let $task: ident =$n1: literal + $n2: literal) => {
-            let $task: Box<dyn Task> = Box::new(SumTask::new($n1, $n2));
-        };
-    }
-    macro_rules! len_task {
-        (let $task: ident =$s: literal) => {
-            let $task: Box<dyn Task> = Box::new(LenTask::new($s.to_owned()));
-        };
-    }
-
-    sum_task!(let t1 = 10+1);
-    len_task!(let t2 = "four");
-    let mut tasker1 = Tasker::new();
-    let mut tasker2 = tasker1.get_tasker();
-    let mut executer1 = tasker2.get_executer();
-    let mut executer2 = tasker1.get_executer();
-    tasker1.schedule_task(t1);
-    tasker2.schedule_task(t2);
-    println!("{:?}",executer1.execute_task());
-    println!("{:?}",executer2.execute_task());
+    
 }

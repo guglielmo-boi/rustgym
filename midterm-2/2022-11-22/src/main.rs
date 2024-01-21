@@ -125,19 +125,14 @@ impl<T> List<T>
         } else {
             let mut new_node = Box::new(Node{elem: e, next: None});
     
-            if p == 0 {
-                new_node.next = self.head.take();
-                self.head = Some(new_node);
-            } else {
-                let mut current = &mut self.head;
+            let mut node = &mut self.head;
 
-                for _ in 0..p {
-                    current = &mut current.as_mut().unwrap().next;
-                }
-                
-                new_node.next = current.take();
-                *current = Some(new_node);
+            for _ in 0..p {
+                node = &mut node.as_mut().unwrap().next;
             }
+            
+            new_node.next = node.take();
+            *node = Some(new_node);
 
             self.len += 1;
 
@@ -148,6 +143,7 @@ impl<T> List<T>
     fn prepend(&mut self, e: T) {
         let new_node = Box::new(Node{elem: e, next: self.head.take()});
         self.head = Some(new_node);
+        self.len += 1;
     }
 }
 
@@ -241,34 +237,34 @@ pub trait SameBool
 }
 
 #[derive(Debug)]
-pub struct NodeContent
+pub struct Content
 {
     pub i: i32,
     pub b: bool
 }
 
-impl NodeContent
+impl Content
 {
-    pub fn new_with(i: i32, b: bool) -> NodeContent {
-        NodeContent { i, b }
+    pub fn new_with(i: i32, b: bool) -> Content {
+        Content { i, b }
     }
 }
 
-impl PartialEq for NodeContent
+impl PartialEq for Content
 {
     fn eq(&self, other: &Self) -> bool {
         self.i == other.i
     }
 }
 
-impl PartialOrd for NodeContent
+impl PartialOrd for Content
 {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         self.i.partial_cmp(&other.i)
     }
 }
 
-impl SameBool for NodeContent
+impl SameBool for Content
 {
     fn samebool(&self, other: &Self) -> bool {
         self.b == other.b
@@ -277,85 +273,5 @@ impl SameBool for NodeContent
 
 fn main() 
 {
-    let x = 5;
-    printdouble(x);
-    let s = "what".to_string();
-    println!("normal s: {:?}",s);
-    printdouble(s);
-    let y = 8;
-    printdouble(y);
-
-    let w = Wrapper{v:vec![11,12,13,14,15,16,17,18]};
-    let mut iw = w.iter();
-    println!("first: {}",iw.next().unwrap());
-    for el in iw{
-        println!("evens: {}",el);
-    }
-
-    let s = vec!["nope".to_string(), "game".to_string(), "bananas".to_string()];
-    println!("boxed s: {:?}", basicbox_sum(s));
-
-    let elem0 = Content::new_with("test".to_string(),true,2);
-    let elem1 = Content::new_with("what".to_string(),true,2);
-    let elem2 = Content::new_with("this".to_string(),false,8);
-    let elem3 = Content::new_with("dope".to_string(),true,18);
-    let mut l = List::new();
-    println!("{:?}",l.add(elem0,1));
-    println!("{:?}",l);
-    l.add(elem1,0);
-    println!("{:?}",l);
-    l.add(elem2,1);
-    println!("{:?}",l);
-    l.add(elem3,2);
-    println!("{:?}",l);
-    let elem4 = Content::new_with("nope".to_string(),false,1);
-    l.add(elem4,4);
-    println!("{:?}",l);
-    let s : String = format!("{:?}",l);
-    assert_eq!(s.contains("Vec"),false);
-
-    let mut el1 = NodeContent{i:10, b:true};
-    let mut el2 = NodeContent{i:11, b:true};
-    let mut el3 = NodeContent{i:12, b:false};
-    let mut g = Graph::new();
-    println!("{:?}",g);
-    g.add_node(el1);
-    println!("{:?}",g);
-    g.add_node(el2);
-    println!("{:?}",g);
-    g.add_node(el3);
-    println!("{:?}",g);
-
-    let mut el1 = NodeContent{i:10, b:true};
-    let mut el2 = NodeContent{i:8, b:false};
-    let mut g = Graph::new();
-    println!("{:?}",g);
-    g.add_node(el1);
-    println!("{:?}",g);
-    g.add_node(el2);
-    println!("{:?}",g);
-
-    let mut el1 = NodeContent{i:10, b:true};
-    let mut el2 = NodeContent{i:11, b:true};
-    let mut el3 = NodeContent{i:12, b:true};
-    let mut g = Graph::new();
-    println!("{:?}",g);
-    g.add_node(el1);
-    println!("{:?}",g);
-    g.add_node(el2);
-    println!("{:?}",g);
-    g.add_node(el3);
-    println!("{:?}",g);
-
-    let mut el1 = NodeContent{i:10, b:true};
-    let mut el2 = NodeContent{i:9, b:false};
-    let mut el3 = NodeContent{i:8, b:true};
-    let mut g = Graph::new();
-    println!("{:?}",g);
-    g.add_node(el1);
-    println!("{:?}",g);
-    g.add_node(el2);
-    println!("{:?}",g);
-    g.add_node(el3);
-    println!("{:?}",g);
+    
 }
