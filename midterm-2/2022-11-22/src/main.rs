@@ -132,7 +132,10 @@ impl<T> List<T>
             }
             
             new_node.next = node.take();
-            *node = Some(new_node);
+            
+            if let Some(node) = node {
+                node.next = Some(new_node);
+            }
 
             self.len += 1;
 
