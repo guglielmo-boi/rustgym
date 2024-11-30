@@ -4,12 +4,11 @@ use std::cell::RefCell;
 use std::fmt::{Debug, Formatter};
 
 /*
-    1. define the Doublable trait with a method gimme_double implement Doublable for i32, gimme_double returns a new i32 
+    1. Define the Doublable trait with a method gimme_double implement Doublable for i32, gimme_double returns a new i32 
     that is twice self implement Doublable for String, gimme_double returns a new String that is self concatenated with self
     implement a function printdouble that takes a Doublable and prints the argument and its gimme_double using the ":?" 
     formatter it behaves as the example: doubling 5 is 10 doubling "what" is "whatwhat".
 */
-
 trait Doublable: Debug
 {
     fn gimme_double(&self) -> Self;
@@ -71,7 +70,7 @@ impl<'a> Iterator for OddIndexIterator<'a>
 }
 
 /*
-    3. write a function basicbox_sum that takes a vector of Strings and returns a vector of Boxes of usizes the returned vector 
+    3. Write a function basicbox_sum that takes a vector of Strings and returns a vector of Boxes of usizes the returned vector 
     contains all the lengths of the input vector followed by a final element that sums all the previous lengths
 */
 fn basicbox_sum(v: Vec<String>) -> Vec<Box<usize>> {
@@ -90,7 +89,7 @@ fn basicbox_sum(v: Vec<String>) -> Vec<Box<usize>> {
 
 
 /*
-    4. take the following List and Node structs define these functions and methods for List, each one defines how many points it 
+    4. Take the following List and Node structs define these functions and methods for List, each one defines how many points it 
     yields - [0.5] new: returns an empty list - [0.5] size: returns the i32 length of the list - [6] add: takes an element e:T and 
     a position p:i32 where to insert the element in the list and it returns a Result<(),String> The function inserts the element e 
     at position p or returns the Err string "wrong position" if the list has fewer than p elements. That is: adding 16 at position 2 

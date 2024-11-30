@@ -7,7 +7,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 /*
-    1. define an i32 constant named "CONSTANT" inside a module named "odd_module" and assign to it the value 123
+    1. Define an i32 constant named "CONSTANT" inside a module named "odd_module" and assign to it the value 123
     define an i32 constant named "CONSTANT" inside a module named "even_module" and assign to it the value
     246
     define a public function "get_constant" inside the module "getter_function" that take as input an u32 named
@@ -40,7 +40,7 @@ pub mod getter_function
 
 
 /*
-    2. define a trait CloneAndDouble with a function clone_and_double(&self)->Self
+    2. Define a trait CloneAndDouble with a function clone_and_double(&self)->Self
     the function clone_and_double clone the item and double it.
     Implement the trait for all items that implement the traits Clone and Add (use a simple addition to double)
 */

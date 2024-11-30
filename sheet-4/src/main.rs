@@ -170,7 +170,6 @@ impl<'a, 'b> ImportantExcerpt<'a>
         s: &T
     }
 */
-
 struct DoubleRef<'a, 'b: 'a, T> 
 {
     r: &'a T,

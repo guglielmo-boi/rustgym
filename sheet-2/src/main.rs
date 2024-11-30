@@ -208,7 +208,6 @@ enum Foo
     let my_box = Box::new(my_expression)
     let value_inside = *my_box
 */
-
 enum Operator
 {
     Add,

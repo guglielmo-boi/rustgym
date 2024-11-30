@@ -10,7 +10,6 @@
 
     If the character is not a letter, it remains unchanged.
 */
-
 fn prev_str(s: &str) -> String {
     let mut ret = String::new();
 
